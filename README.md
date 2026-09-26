@@ -70,7 +70,9 @@ The investigation followed a standard digital forensics lifecycle: Identificatio
 
 ### 5.1. Imaging Process
 *   **Disk Image Acquisition (VMDK):** The system was virtualized. The existing VMDK file was copied to the forensic workstation, and integrity hashes (MD5/SHA1) were generated.
-*   **Memory Acquisition (RAM Image):** FTK Imager’s Memory Capture module was executed inside the VM to acquire full RAM (`memdump.mem`). 
+*   **Memory Acquisition (RAM Image):** FTK Imager’s Memory Capture module was executed inside the VM to acquire full RAM (`memdump.mem`).
+
+![Wazuh Dashboard – External Device Alert Timeline](images/1.png)
 
 ## 6. Forensic Analysis
 
@@ -80,6 +82,8 @@ The investigation was initiated based on a Wazuh security alert indicating a new
 *   **Date/Time:** Dec 11, 2025 @ 01:23:59
 *   **Rule Triggered:** A new external device was recognized by the system (Rule ID: 60227)
 *   **Event ID:** 6416
+
+ ![Wazuh Dashboard – External Device Alert Timeline](images/2.png)
 
 ### 6.2. Disk Analysis (Autopsy)
 

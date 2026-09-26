@@ -91,20 +91,37 @@ The investigation was initiated based on a Wazuh security alert indicating a new
 *   **Evidence Source:** `SYSTEM` hive -> `Enum\USBSTOR`
 *   **Significance:** Confirmed a Kingston DataTraveler 3.0 USB device was connected, serving as the delivery mechanism.
 
+![USB Connection Verified from Registry](images/3.png)
+
 **Malicious Files on Desktop:**
 *   **Evidence Source:** File System View (`/Users/Markhor/Desktop/Toyota Car Models/`)
 *   **Artifacts:** `New Toyota Models - Shortcut.lnk`, `New Toyota Models.vbs`, `run.bat`, `g.py`.
 *   **Significance:** Indicates the payload was staged on the Desktop.
 
+ ![Malicious Files that executed Malicious Payload](images/4.png)
+
 **Execution Traces (Prefetch Analysis):**
 *   **VBS Script (`wscript.exe`):** Creation of `WSCRIPT.EXE-*.pf`. Confirms the `.vbs` script was executed by the user.
+
+  ![Execution of VBS Script](images/5.png)
+  
 *   **BAT File (`cmd.exe`):** Creation of `CMD.EXE-*.pf`. Indicates the batch file (`run.bat`) executed as the second stage.
+
+  ![Indicator of Batch (bat) file was executed](images/6.png)
+  
 *   **Python Script (`python.exe`):** Creation of `PYTHON.EXE-*.pf`. Confirms the Python script (`g.py`) executed as the final malicious stage.
+
+ ![Verification of Python Script Execution](images/7.png)
+ 
 *   **Attacker Commands:** Prefetch files for `TASKLIST.EXE-*.pf` (process enumeration) and `SCHTASKS.EXE-*.pf` (persistence attempts) were identified.
+
+ ![Verification of Attempts to Establish Persistence](images/8.png)
 
 **Exfiltration Archive:**
 *   **Artifact:** `toyota.zip` created in the user’s `Documents` folder.
 *   **Significance:** Created significantly later than the initial compromise, indicating active data staging for exfiltration by the attacker.
+
+![Detection of Unknown and Suspicious ZIP File](images/9.png)
 
 ### 6.3. Volatile Memory Analysis (Volatility 3)
 
@@ -114,13 +131,19 @@ The analysis showed that the attack originated from `explorer.exe` (user interac
 2. `wscript.exe` started `cmd.exe`
 3. `cmd.exe` launched `python.exe` (PID 3796 - main payload)
 
+ ![Execution chain from explorer.exe to python.exe](images/10.png)
+
 **Command-Line Activity (`windows.cmdline`):**
 *   `wscript.exe` executed `New Toyota Models.vbs`
 *   `cmd.exe` executed `run.bat`
 *   `python.exe` executed `g.py`
 
+ ![WINDOWS.CMDLINE OUTPUT SHOWING COMMAND-LINE ARGUMENTS FOR MALICIOUS PROCESSES](images/11.png)
+
 **In-Memory Code Injection (`windows.malfind`):**
 Identified suspicious memory regions within `python.exe` (PID 3796) with Read/Write/Execute (RWX) permissions and no backing file on disk. Disassembly showed patterns associated with shellcode (XOR-based decryption routines), proving the fileless injection technique.
+
+![Highlighting RWX memory regions and injected shellcode within python.exe](images/12.png)
 
 **Network Activity (`windows.netscan`):**
 An established outbound connection was identified:
@@ -128,6 +151,8 @@ An established outbound connection was identified:
 *   **Remote IP:** 192.168.66.154
 *   **Port:** 4444 (Standard Meterpreter port)
 *   **Associated Process:** `python.exe` (PID 3796)
+
+ ![SHOWING AN ESTABLISHED CONNECTION FROM PYTHON.EXE ON PORT 4444](images/13.png)
 
 ## 7. Findings & Results
 
